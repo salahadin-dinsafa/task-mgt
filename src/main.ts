@@ -17,7 +17,7 @@ const logStream = fs.createWriteStream('api.log', { flags: 'a' })
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.use(morgan('combined', { stream: logStream }));
+  app.use(morgan('common', { stream: logStream }));
   app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen(3000);
 }

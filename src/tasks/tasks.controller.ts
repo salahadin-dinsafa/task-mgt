@@ -3,8 +3,9 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query 
 import { TasksService } from "@app/tasks/tasks.service";
 import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { AddTaskDto } from '@app/tasks/dto/add-task.dto';
-import { UpdateTaskDto } from '@app/tasks/dto/update-task.dto';
 import { PaginationDto } from '@app/tasks/dto/pagination.dto';
+import { TaskPipe } from "@app/tasks/pipe/task.pipe";
+import { TaskStatus } from "./types/task-status.enum";
 
 @Controller('tasks')
 export class TasksController {
@@ -30,9 +31,9 @@ export class TasksController {
     @Patch(':id/status')
     updateTask(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updateTaskDto: UpdateTaskDto,
+        @Body('status', TaskPipe) status: TaskStatus,
     ): TaskEntity {
-        return this.taskService.updateTask(id, updateTaskDto);
+        return this.taskService.updateTask(id, status);
     }
 
     @Delete(':id')

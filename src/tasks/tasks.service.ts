@@ -1,9 +1,12 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import {
+    Injectable,
+    InternalServerErrorException, NotFoundException
+} from "@nestjs/common";
 
 import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { AddTaskType } from "@app/tasks/types/add-task.type";
-import { UpdateTaskType } from "@app/tasks/types/update-task.type";
 import { PaginationType } from "@app/tasks/types/pagination.type";
+import { TaskStatus } from "./types/task-status.enum";
 
 @Injectable()
 export class TasksService {
@@ -49,10 +52,10 @@ export class TasksService {
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
-    updateTask(id: number, updateTask: UpdateTaskType): TaskEntity {
+    updateTask(id: number, status: TaskStatus): TaskEntity {
         let task: TaskEntity = this.findTaskById(id);
         try {
-            task.status = updateTask.status;
+            task.status = status;
             let currentTaskIndex: number = this.tasks.indexOf(task);
             this.tasks[currentTaskIndex] = task;
             return task;
