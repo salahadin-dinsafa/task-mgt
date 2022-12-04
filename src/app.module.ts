@@ -1,11 +1,21 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 
-import { AppController } from '@app/app.controller';
-import { AppService } from '@app/app.service';
+import { TasksModule } from '@app/tasks/tasks.module';
+import { APP_PIPE } from '@nestjs/core';
+
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [TasksModule],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useFactory: () => new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        transformOptions: { enableImplicitConversion: true }
+      })
+    }
+  ]
 })
 export class AppModule { }
