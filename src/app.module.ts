@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { TasksModule } from '@app/tasks/tasks.module';
 import { ormConfig } from '@app/common/db/ormconfig.db';
+import { AuthModule } from './auth/auth.module';
 import * as Joi from '@hapi/joi';
 
 
@@ -23,7 +24,8 @@ import * as Joi from '@hapi/joi';
     TasksModule,
     TypeOrmModule.forRootAsync({
       useFactory: ormConfig
-    })
+    }),
+    AuthModule
   ],
   providers: [
     {

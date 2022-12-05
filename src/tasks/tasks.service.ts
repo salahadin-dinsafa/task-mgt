@@ -1,6 +1,6 @@
 import {
     Injectable,
-    InternalServerErrorException, NotFoundException
+    InternalServerErrorException, Logger, NotFoundException
 } from "@nestjs/common";
 
 import { InjectRepository } from "@nestjs/typeorm";
@@ -10,22 +10,31 @@ import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { AddTaskType } from "@app/tasks/types/add-task.type";
 import { PaginationType } from "@app/tasks/types/pagination.type";
 import { TaskStatus } from "@app/tasks/types/task-status.enum";
+import { UserEntity } from "@app/auth/entities/user.entity";
+import { Role } from "@app/auth/types/role.enum";
 
 
 @Injectable()
 export class TasksService {
+    private logger = new Logger('TasksService');
     constructor(
         @InjectRepository(TaskEntity)
         private readonly taskRespository: Repository<TaskEntity>,
         private readonly datasource: DataSource
     ) { }
-    async findAllTasks(pagination: PaginationType): Promise<TaskEntity[]> {
+    async findAllTasks(user: UserEntity, pagination: PaginationType): Promise<TaskEntity[]> {
         const { limit, offset, status, search } = pagination;
         try {
-            const queryBuilder =
-                this.datasource.getRepository(TaskEntity).createQueryBuilder('tasks');
+            const queryBuilder = this.datasource
+                .getRepository(TaskEntity)
+                .createQueryBuilder('tasks')
+                .leftJoinAndSelect('tasks.author', 'author');
+            user.role === Role.ADMIN ? null :
+                queryBuilder.andWhere('author.id = :id', { id: user.id });
+
             search ?
-                queryBuilder.andWhere(`(tasks.title LIKE :search OR tasks.description LIKE :search)`,
+                queryBuilder.andWhere(
+                    `(tasks.title LIKE :search OR tasks.description LIKE :search)`,
                     { search: `%${search}%` }) :
                 null;
             status ?
@@ -39,49 +48,56 @@ export class TasksService {
                 queryBuilder.skip(0);
             return await queryBuilder.getMany();
         } catch (error) {
-            console.log(`Error: ${error}`);
+            this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(
                 `Internal server error occured: ${error.message}`)
         }
     }
-    async findTaskById(id: number): Promise<TaskEntity> {
+    async findTaskById(user: UserEntity, id: number): Promise<TaskEntity> {
         let task: TaskEntity;
         try {
-            task = await this.taskRespository.findOne({ where: { id } })
+            task = user.role === Role.ADMIN ?
+                await this.taskRespository.findOne({ where: { id } }) :
+                user.tasks.find(task => task.id === id);
         } catch (error) {
-            console.log(`Error: ${error}`);
+            this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(
                 `Internal server error occured: ${error.message}`)
         }
         if (!task) throw new NotFoundException(`Task with #id: ${id} not found`);
         return task;
     }
-    async addTask(addTask: AddTaskType): Promise<TaskEntity> {
+    async addTask(user: UserEntity, addTask: AddTaskType): Promise<TaskEntity> {
         try {
-            const task: TaskEntity = this.taskRespository.create(addTask);
-
-            return await this.taskRespository.save(task);
+            const task: TaskEntity = this.taskRespository.create({
+                ...addTask,
+                author: user
+            });
+            return await this.taskRespository.save(task).then(task => {
+                delete task.author;
+                return task
+            });
         } catch (error) {
-            console.log(`Error: ${error}`);
+            this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
-    async updateTask(id: number, status: TaskStatus): Promise<TaskEntity> {
-        let task: TaskEntity = await this.findTaskById(id);
+    async updateTask(user: UserEntity, id: number, status: TaskStatus): Promise<TaskEntity> {
+        let task: TaskEntity = await this.findTaskById(user, id);
         try {
             task.status = status;
             return await this.taskRespository.save(task);
         } catch (error) {
-            console.log(`Error: ${error}`);
+            this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
-    async removeTask(id: number): Promise<void> {
-        let task: TaskEntity = await this.findTaskById(id);
+    async removeTask(user: UserEntity, id: number): Promise<void> {
+        let task: TaskEntity = await this.findTaskById(user, id);
         try {
             await this.taskRespository.remove(task);
         } catch (error) {
-            console.log(`Error: ${error}`);
+            this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }

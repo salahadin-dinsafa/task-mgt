@@ -1,5 +1,5 @@
 import {
-    ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException, HttpStatus
+    ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException, HttpStatus, Logger
 }
     from "@nestjs/common";
 import { Request, Response } from "express";
@@ -14,6 +14,7 @@ import {
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+    private logger = new Logger('Exception');
     catch(exception: any, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
@@ -22,19 +23,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
         let status: HttpStatus;
         let errorMessage: string;
 
-
         if (exception instanceof HttpException) {
             if (exception instanceof BadRequestException) {
                 status = exception.getStatus();
                 const errorResponse = exception.getResponse();
                 errorMessage = (errorResponse as HttpExceptionResponse).message;
+                this.logger.error(`Path: ${request.url} Exception: ${errorMessage}`)
             } else {
                 status = exception.getStatus();
                 const errorResponse = exception.getResponse();
                 errorMessage = exception.message || (errorResponse as HttpExceptionResponse).error;
+                this.logger.error(`Path: ${request.url} Exception: ${errorMessage}`)
             }
         }
         else {
+            this.logger.error(`Path: ${request.url} Exception: ${errorMessage}`)
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             errorMessage = 'Critical internal server error occurred!'
         }
