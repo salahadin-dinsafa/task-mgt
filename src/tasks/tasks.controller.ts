@@ -4,6 +4,7 @@ import {
 } from "@nestjs/common";
 
 import { AuthGuard } from "@nestjs/passport";
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { UserEntity } from "@app/auth/entities/user.entity";
@@ -16,7 +17,12 @@ import { TaskPipe } from "@app/tasks/pipe/task.pipe";
 import { TaskStatus } from "@app/tasks/types/task-status.enum";
 import { RolesGuard } from "@app/auth/guards/roles.guard";
 import { Role } from "@app/auth/types/role.enum";
+import { CoustomeExceptionDto } from "@app/common/types/http-exception-response.interface";
 
+@ApiResponse({ status: 403, type: CoustomeExceptionDto })
+@ApiBadRequestResponse({ description: 'Invalid request' })
+@ApiInternalServerErrorResponse({ description: 'Internal server error occured' })
+@ApiTags('Tasks')
 @UseGuards(AuthGuard(), RolesGuard)
 @Controller('tasks')
 export class TasksController {
@@ -24,6 +30,7 @@ export class TasksController {
     constructor(
         private readonly taskService: TasksService
     ) { }
+
 
     @Roles(Role.ADMIN, Role.USER)
     @Get()
@@ -37,6 +44,8 @@ export class TasksController {
         return this.taskService.findAllTasks(user, paginationDto);
     }
 
+
+    @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Get(':id')
     findTaskById(
@@ -61,6 +70,7 @@ export class TasksController {
         return this.taskService.addTask(user, addTaskDto);
     }
 
+    @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Patch(':id/status')
     updateTask(
@@ -74,6 +84,7 @@ export class TasksController {
         return this.taskService.updateTask(user, id, status);
     }
 
+    @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Delete(':id')
     removeTask(

@@ -60,6 +60,7 @@ export class AuthService {
             UnauthorizedException('Invalid Creadential');
         const payload: JwtPayload = ({ username, role: user.role });
         const accessToken: string = await this.jwtService.signAsync(payload);
+        this.logger.debug(`Generating Jwt token with payload: ${JSON.stringify(payload)}`)
         return { accessToken }
     }
 }
