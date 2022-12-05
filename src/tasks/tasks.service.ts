@@ -21,16 +21,23 @@ export class TasksService {
     ) { }
     async findAllTasks(pagination: PaginationType): Promise<TaskEntity[]> {
         const { limit, offset, status, search } = pagination;
-        let tasks: TaskEntity[];
         try {
-            tasks = await this.taskRespository.find();
-            tasks = status ?
-                tasks.filter(task => task.status === status) :
-                tasks;
-            tasks = search ?
-                tasks.filter(task => task.body.includes(search) || task.description.includes(search)) :
-                tasks;
-            return tasks.slice(offset, limit);
+            const queryBuilder =
+                this.datasource.getRepository(TaskEntity).createQueryBuilder('tasks');
+            search ?
+                queryBuilder.andWhere(`(tasks.title LIKE :search OR tasks.description LIKE :search)`,
+                    { search: `%${search}%` }) :
+                null;
+            status ?
+                queryBuilder.andWhere(`tasks.status = :status`, { status }) :
+                null;
+            limit ?
+                queryBuilder.take(limit) :
+                queryBuilder.take(10);
+            offset ?
+                queryBuilder.skip(offset) :
+                queryBuilder.skip(0);
+            return await queryBuilder.getMany();
         } catch (error) {
             console.log(`Error: ${error}`);
             throw new InternalServerErrorException(

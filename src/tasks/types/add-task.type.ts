@@ -1,7 +1,7 @@
 import { TaskStatus } from "@app/tasks/types/task-status.enum";
 
 export interface AddTaskType {
-    body: string;
+    title: string;
     description: string;
     status?: TaskStatus;
 }

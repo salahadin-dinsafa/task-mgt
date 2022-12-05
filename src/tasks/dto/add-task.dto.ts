@@ -4,7 +4,7 @@ import { TaskStatus } from '@app/tasks/types/task-status.enum';
 export class AddTaskDto {
     @IsNotEmpty()
     @IsString()
-    body: string;
+    title: string;
 
     @IsNotEmpty()
     @IsString()

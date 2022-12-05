@@ -9,7 +9,7 @@ export class TaskEntity extends BaseEntity {
     id: number;
 
     @Column({ default: '' })
-    body: string;
+    title: string;
 
     @Column({ default: '' })
     description: string;
