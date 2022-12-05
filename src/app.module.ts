@@ -1,11 +1,30 @@
 import { Module, ValidationPipe } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 import { TasksModule } from '@app/tasks/tasks.module';
-import { APP_PIPE } from '@nestjs/core';
+import { ormConfig } from '@app/common/db/ormconfig.db';
+import * as Joi from '@hapi/joi';
 
 
 @Module({
-  imports: [TasksModule],
+  imports: [
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        DB_HOST: Joi.required(),
+        DB_PORT: Joi.required().default(5432),
+        DB_NAME: Joi.required(),
+        DB_USER: Joi.required(),
+        DB_PASSWORD: Joi.required()
+      })
+    }),
+    TasksModule,
+    TypeOrmModule.forRootAsync({
+      useFactory: ormConfig
+    })
+  ],
   providers: [
     {
       provide: APP_PIPE,

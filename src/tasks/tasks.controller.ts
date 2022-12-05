@@ -5,7 +5,7 @@ import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { AddTaskDto } from '@app/tasks/dto/add-task.dto';
 import { PaginationDto } from '@app/tasks/dto/pagination.dto';
 import { TaskPipe } from "@app/tasks/pipe/task.pipe";
-import { TaskStatus } from "./types/task-status.enum";
+import { TaskStatus } from "@app/tasks/types/task-status.enum";
 
 @Controller('tasks')
 export class TasksController {
@@ -14,17 +14,17 @@ export class TasksController {
     ) { }
 
     @Get()
-    findAllTasks(@Query() paginationDto: PaginationDto): TaskEntity[] {
+    findAllTasks(@Query() paginationDto: PaginationDto): Promise<TaskEntity[]> {
         return this.taskService.findAllTasks(paginationDto);
     }
 
     @Get(':id')
-    findTaskById(@Param('id', ParseIntPipe) id: number): TaskEntity {
+    findTaskById(@Param('id', ParseIntPipe) id: number): Promise<TaskEntity> {
         return this.taskService.findTaskById(id)
     }
 
     @Post()
-    AddTask(@Body() addTaskDto: AddTaskDto): TaskEntity {
+    AddTask(@Body() addTaskDto: AddTaskDto): Promise<TaskEntity> {
         return this.taskService.addTask(addTaskDto);
     }
 
@@ -32,12 +32,12 @@ export class TasksController {
     updateTask(
         @Param('id', ParseIntPipe) id: number,
         @Body('status', TaskPipe) status: TaskStatus,
-    ): TaskEntity {
+    ): Promise<TaskEntity> {
         return this.taskService.updateTask(id, status);
     }
 
     @Delete(':id')
-    removeTask(@Param('id', ParseIntPipe) id: number): void {
+    removeTask(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.taskService.removeTask(id);
     }
 }

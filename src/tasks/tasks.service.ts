@@ -3,20 +3,27 @@ import {
     InternalServerErrorException, NotFoundException
 } from "@nestjs/common";
 
+import { InjectRepository } from "@nestjs/typeorm";
+import { DataSource, Repository } from "typeorm";
+
 import { TaskEntity } from "@app/tasks/entities/task.entity";
 import { AddTaskType } from "@app/tasks/types/add-task.type";
 import { PaginationType } from "@app/tasks/types/pagination.type";
-import { TaskStatus } from "./types/task-status.enum";
+import { TaskStatus } from "@app/tasks/types/task-status.enum";
+
 
 @Injectable()
 export class TasksService {
-    tasks: TaskEntity[] = [];
-    id: number = 0;
-    findAllTasks(pagination: PaginationType): TaskEntity[] {
+    constructor(
+        @InjectRepository(TaskEntity)
+        private readonly taskRespository: Repository<TaskEntity>,
+        private readonly datasource: DataSource
+    ) { }
+    async findAllTasks(pagination: PaginationType): Promise<TaskEntity[]> {
         const { limit, offset, status, search } = pagination;
         let tasks: TaskEntity[];
         try {
-            tasks = this.tasks;
+            tasks = await this.taskRespository.find();
             tasks = status ?
                 tasks.filter(task => task.status === status) :
                 tasks;
@@ -30,10 +37,10 @@ export class TasksService {
                 `Internal server error occured: ${error.message}`)
         }
     }
-    findTaskById(id: number): TaskEntity {
+    async findTaskById(id: number): Promise<TaskEntity> {
         let task: TaskEntity;
         try {
-            task = this.tasks.find(task => task.id === id)
+            task = await this.taskRespository.findOne({ where: { id } })
         } catch (error) {
             console.log(`Error: ${error}`);
             throw new InternalServerErrorException(
@@ -42,33 +49,30 @@ export class TasksService {
         if (!task) throw new NotFoundException(`Task with #id: ${id} not found`);
         return task;
     }
-    addTask(addTask: AddTaskType): TaskEntity {
+    async addTask(addTask: AddTaskType): Promise<TaskEntity> {
         try {
-            let task: TaskEntity = { ...addTask, id: this.id++ };
-            this.tasks.push(task);
-            return this.tasks[this.tasks.length - 1];
+            const task: TaskEntity = this.taskRespository.create(addTask);
+
+            return await this.taskRespository.save(task);
         } catch (error) {
             console.log(`Error: ${error}`);
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
-    updateTask(id: number, status: TaskStatus): TaskEntity {
-        let task: TaskEntity = this.findTaskById(id);
+    async updateTask(id: number, status: TaskStatus): Promise<TaskEntity> {
+        let task: TaskEntity = await this.findTaskById(id);
         try {
             task.status = status;
-            let currentTaskIndex: number = this.tasks.indexOf(task);
-            this.tasks[currentTaskIndex] = task;
-            return task;
+            return await this.taskRespository.save(task);
         } catch (error) {
             console.log(`Error: ${error}`);
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
-    removeTask(id: number): void {
-        this.findTaskById(id);
+    async removeTask(id: number): Promise<void> {
+        let task: TaskEntity = await this.findTaskById(id);
         try {
-            this.tasks = this.tasks.filter(singleTask => singleTask.id !== id);
-            return;
+            await this.taskRespository.remove(task);
         } catch (error) {
             console.log(`Error: ${error}`);
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)

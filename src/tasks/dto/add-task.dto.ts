@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { TaskStatus } from '@app/tasks/types/task-status.enum';
 
 export class AddTaskDto {
@@ -10,7 +10,7 @@ export class AddTaskDto {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @IsIn([TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.OPEN])
     status: TaskStatus
