@@ -1,7 +1,7 @@
 import { IsOptional, IsNumber, Min, IsIn, IsString } from 'class-validator';
-
-import { TaskStatus } from '@app/tasks/types/task-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { TaskStatus } from '../types/task-status.enum';
 
 export class PaginationDto {
     @ApiProperty({

@@ -4,8 +4,8 @@ import {
 } from "typeorm";
 
 import { hash } from 'bcryptjs';
-import { Role } from "@app/auth/types/role.enum";
-import { TaskEntity } from "@app/tasks/entities/task.entity";
+import { Role } from "../types/role.enum";
+import { TaskEntity } from "../../tasks/entities/task.entity";
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {

@@ -1,4 +1,4 @@
-import { TaskStatus } from "@app/tasks/types/task-status.enum";
+import { TaskStatus } from "../types/task-status.enum";
 
 export interface AddTaskType {
     title: string;

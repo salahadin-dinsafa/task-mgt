@@ -6,18 +6,18 @@ import {
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import { TaskEntity } from "@app/tasks/entities/task.entity";
-import { UserEntity } from "@app/auth/entities/user.entity";
-import { PaginationDto } from '@app/tasks/dto/pagination.dto';
-import { AddTaskDto } from '@app/tasks/dto/add-task.dto';
-import { GetUser } from "@app/auth/decorator/get-user.decorator";
-import { Roles } from "@app/auth/decorator/roles.decorator";
-import { TasksService } from "@app/tasks/tasks.service";
-import { TaskPipe } from "@app/tasks/pipe/task.pipe";
-import { TaskStatus } from "@app/tasks/types/task-status.enum";
-import { RolesGuard } from "@app/auth/guards/roles.guard";
-import { Role } from "@app/auth/types/role.enum";
-import { CoustomeExceptionDto } from "@app/common/types/http-exception-response.interface";
+import { TaskEntity } from "./entities/task.entity";
+import { UserEntity } from "../auth/entities/user.entity";
+import { PaginationDto } from './dto/pagination.dto';
+import { AddTaskDto } from './dto/add-task.dto';
+import { GetUser } from "../auth/decorator/get-user.decorator";
+import { Roles } from "../auth/decorator/roles.decorator";
+import { TasksService } from "./tasks.service";
+import { TaskPipe } from "./pipe/task.pipe";
+import { TaskStatus } from "./types/task-status.enum";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Role } from "../auth/types/role.enum";
+import { CoustomeExceptionDto } from "../common/types/http-exception-response.interface";
 
 @ApiResponse({ status: 403, type: CoustomeExceptionDto })
 @ApiBadRequestResponse({ description: 'Invalid request' })

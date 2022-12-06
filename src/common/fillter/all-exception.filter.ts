@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import {
     CoustomeHttpExceptionResponse, HttpExceptionResponse
 }
-    from "@app/common/types/http-exception-response.interface";
+    from "../../common/types/http-exception-response.interface";
 
 
 @Catch()

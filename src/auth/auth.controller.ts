@@ -4,10 +4,10 @@ import {
     ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiTags, ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 
-import { AuthService } from '@app/auth/auth.service';
-import { SignupDto } from '@app/auth/dto/signup.dto';
-import { UserEntity } from '@app/auth/entities/user.entity';
-import { LoginDto } from '@app/auth/dto/login.dto';
+import { AuthService } from './auth.service';
+import { SignupDto } from './dto/signup.dto';
+import { UserEntity } from './entities/user.entity';
+import { LoginDto } from './dto/login.dto';
 
 @ApiBadRequestResponse({ description: 'Invalid request' })
 @ApiInternalServerErrorResponse({ description: 'Internal server error occured' })

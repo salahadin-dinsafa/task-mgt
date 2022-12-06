@@ -8,10 +8,10 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { compare } from 'bcryptjs';
 
-import { SignupType } from '@app/auth/types/signup.interface';
-import { UserEntity } from '@app/auth/entities/user.entity';
-import { LoginType } from '@app/auth/types/login.interface';
-import { JwtPayload } from '@app/auth/types/jwt-payload.interface';
+import { SignupType } from './types/signup.interface';
+import { UserEntity } from './entities/user.entity';
+import { LoginType } from './types/login.interface';
+import { JwtPayload } from './types/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {

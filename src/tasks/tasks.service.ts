@@ -6,12 +6,12 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 
-import { TaskEntity } from "@app/tasks/entities/task.entity";
-import { AddTaskType } from "@app/tasks/types/add-task.type";
-import { PaginationType } from "@app/tasks/types/pagination.type";
-import { TaskStatus } from "@app/tasks/types/task-status.enum";
-import { UserEntity } from "@app/auth/entities/user.entity";
-import { Role } from "@app/auth/types/role.enum";
+import { TaskEntity } from "./entities/task.entity";
+import { AddTaskType } from "./types/add-task.type";
+import { PaginationType } from "./types/pagination.type";
+import { TaskStatus } from "./types/task-status.enum";
+import { UserEntity } from "../auth/entities/user.entity";
+import { Role } from "../auth/types/role.enum";
 
 
 @Injectable()

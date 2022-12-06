@@ -1,7 +1,7 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
-import { TaskStatus } from "@app/tasks/types/task-status.enum";
-import { UserEntity } from '@app/auth/entities/user.entity';
+import { TaskStatus } from "../types/task-status.enum";
+import { UserEntity } from '../../auth/entities/user.entity';
 
 
 @Entity({ name: 'tasks' })
