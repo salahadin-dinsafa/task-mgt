@@ -7,7 +7,8 @@ import { Repository } from "typeorm";
 
 import { AuthService } from "./auth.service";
 import { UserEntity } from "./entities/user.entity";
-import { SignupDto } from "./dto/signup.dto";
+import { LoginType } from "./types/login.interface";
+import { SignupType } from "./types/signup.interface";
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 type MockJwtService = Partial<Record<keyof JwtService, jest.Mock>>;
@@ -28,11 +29,8 @@ describe('AuthService', () => {
         password: '$2a$15$ruyi7lFfNFSoQoLaFMKiP.Fe6h6bT6Z.Ofab9ceu77x3HWkCBTMl2',
         role: 'USER'
     }
-    const mockSignupDto: SignupDto = { username: 'foooo', password: 'foooo' }
-    const mockloginDto: SignupDto = {
-        username: 'foo',
-        password: 'A/ur14648/10'
-    }
+    const mockSignupType: SignupType = { username: 'foooo', password: 'foooo' }
+    const mockloginType: LoginType = { username: 'foo', password: 'A/ur14648/10' }
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -80,16 +78,15 @@ describe('AuthService', () => {
         describe('When the user successfuly signed up', () => {
             it('should return user', async () => {
                 userRepository.save.mockReturnValue(mockUser);
-                const user = await authService.signup(mockSignupDto);
+                const user = await authService.signup(mockSignupType);
                 expect(user).toEqual(mockUser);
             })
         })
         describe('Otherwise', () => {
             it('should throw exception', async () => {
-                const signupDto: SignupDto = { username: 'foooo', password: 'foooo' }
                 userRepository.save.mockReturnValue(undefined);
                 try {
-                    await authService.signup(signupDto);
+                    await authService.signup({ ...mockSignupType, username: 'admin' });
                 } catch (error) {
                     expect(error).toBeInstanceOf(ConflictException);
                     expect(error.message).toEqual('user already exist');
@@ -101,14 +98,16 @@ describe('AuthService', () => {
         describe('When user successfuly logged in', () => {
             it('should return accessToken', async () => {
                 userRepository.findOne.mockReturnValue(mockUser);
-                const accessToken = await authService.login(mockloginDto);
-                expect(accessToken).toMatchObject
+                const accessToken = await authService.login(mockloginType);
+                expect(accessToken).toBeDefined(),
+                    expect(accessToken).toBeInstanceOf(Object)
             })
         })
         describe('Otherwise', () => {
             it('should throw exception if user does not exist', async () => {
                 try {
-                    await authService.login(mockloginDto);
+                    const accessToken = await authService.login(mockloginType);
+                    expect(accessToken).toThrowError();
                 } catch (error) {
                     expect(error).toBeInstanceOf(UnauthorizedException);
                     expect(error.message).toEqual('Invalid Creadential');
@@ -117,7 +116,8 @@ describe('AuthService', () => {
             it('should throw exception if password not correct', async () => {
                 userRepository.findOne.mockReturnValue(mockUser);
                 try {
-                    await authService.login({ ...mockloginDto, password: 'wrongpassword' });
+                    const accessToken = await authService.login({ ...mockloginType, password: 'wrongpassword' });
+                    expect(accessToken).toThrowError();
                 } catch (error) {
                     expect(error).toBeInstanceOf(UnauthorizedException);
                     expect(error.message).toEqual('Invalid Creadential')

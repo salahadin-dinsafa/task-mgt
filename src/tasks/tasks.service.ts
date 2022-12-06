@@ -73,10 +73,9 @@ export class TasksService {
                 ...addTask,
                 author: user
             });
-            return await this.taskRespository.save(task).then(task => {
-                delete task.author;
-                return task
-            });
+            const savedTask = await this.taskRespository.save(task);
+            delete savedTask.author;
+            return savedTask;
         } catch (error) {
             this.logger.error(`Error: ${error.message}`)
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)

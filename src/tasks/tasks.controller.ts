@@ -60,7 +60,7 @@ export class TasksController {
 
     @Roles(Role.ADMIN, Role.USER)
     @Post()
-    AddTask(
+    addTask(
         @Body() addTaskDto: AddTaskDto,
         @GetUser() user: UserEntity,
     ): Promise<TaskEntity> {
