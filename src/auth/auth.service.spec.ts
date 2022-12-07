@@ -23,7 +23,8 @@ const createMockJwtService = (): MockJwtService => ({
 describe('AuthService', () => {
     let authService: AuthService;
     let userRepository: MockRepository;
-
+    jest.setTimeout(30);
+    
     const mockUser = {
         username: 'foo',
         password: '$2a$15$ruyi7lFfNFSoQoLaFMKiP.Fe6h6bT6Z.Ofab9ceu77x3HWkCBTMl2',

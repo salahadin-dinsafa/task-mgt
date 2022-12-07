@@ -25,6 +25,8 @@ describe('AuthController', () => {
     let authController: AuthController;
     let authService: AuthService;
 
+    jest.setTimeout(30);
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AuthController],
