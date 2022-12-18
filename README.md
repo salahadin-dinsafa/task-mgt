@@ -1,13 +1,25 @@
 <h1>Task management application</h2>
-<l>
-  <dl>Framework</dl>
-  <dd>Nestjs<dd>
-  <dl>ORM</dl>
-  <dd>Typeorm<dd>
-  <dl>Database</dl>
-  <dd>postgres<dd>
-  <dl>Testing</dl>
-  <dd>jest<dd>
-  <dl>Authorization</dl>
-  <dd>passport with jwt<dd>
-</l>
+<ul>
+  <li>Framework</li>
+  <li>Nestjs<li>
+</ul>
+<ul>
+  <li>ORM</li>
+  <li>Typeorm<li>
+</ul>
+<ul>
+  <li>Database</li>
+  <li>Postgres<li>
+</ul>
+<ul>
+  <li>Testing</li>
+  <li>Jest<li>
+</ul>
+<ul>
+  <li>Authorization</li>
+  <li>Passport | Jwt<li>
+</ul>
+
+<h1>Instruction</h1>
+<p>start app: npm run start</p>
+<p>start app development: npm run start:dev</p>
