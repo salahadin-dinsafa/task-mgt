@@ -20,6 +20,8 @@ import { AppController } from './app.controller';
         DB_NAME: Joi.required(),
         DB_USER: Joi.required(),
         DB_PASSWORD: Joi.required(),
+        JWT_SECRET: Joi.required(),
+        ROLES_KEY: Joi.required()
       })
     }),
     TasksModule,
