@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { TaskEntity } from "./entities/task.entity";
 import { UserEntity } from "../auth/entities/user.entity";
@@ -31,7 +31,7 @@ export class TasksController {
         private readonly taskService: TasksService
     ) { }
 
-
+    @ApiOperation({ description: 'Get all tasks create by user: Auth required', summary: 'Get letest articles' })
     @Roles(Role.ADMIN, Role.USER)
     @Get()
     findAllTasks(
@@ -45,6 +45,7 @@ export class TasksController {
     }
 
 
+    @ApiOperation({ description: 'Get a task create by user: Auth required', summary: 'Get a single task' })
     @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Get(':id')
@@ -58,6 +59,7 @@ export class TasksController {
         return this.taskService.findTaskById(user, id)
     }
 
+    @ApiOperation({ description: 'Create task: Auth required', summary: 'Create task' })
     @Roles(Role.ADMIN, Role.USER)
     @Post()
     addTask(
@@ -70,6 +72,7 @@ export class TasksController {
         return this.taskService.addTask(user, addTaskDto);
     }
 
+    @ApiOperation({ description: 'Update task created by user: Auth required', summary: 'Update task' })
     @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Patch(':id/status')
@@ -84,6 +87,7 @@ export class TasksController {
         return this.taskService.updateTask(user, id, status);
     }
 
+    @ApiOperation({ description: 'Delete task created by user: Auth required', summary: 'Delete task' })
     @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Delete(':id')

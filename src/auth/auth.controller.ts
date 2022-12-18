@@ -1,7 +1,7 @@
 import { Body, Controller, Logger, Post } from '@nestjs/common';
 
 import {
-    ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiTags, ApiUnauthorizedResponse
+    ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -18,7 +18,7 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService
     ) { }
-
+    @ApiOperation({ description: 'Registring user', summary: 'Register user' })
     @ApiConflictResponse({ description: 'user already exist' })
     @Post('signup')
     signup(@Body() signupDto: SignupDto): Promise<UserEntity> {
@@ -26,6 +26,7 @@ export class AuthController {
         return this.authService.signup(signupDto);
     }
 
+    @ApiOperation({ description: 'login user', summary: 'Login user' })
     @ApiUnauthorizedResponse({ description: 'Invalid Creadential' })
     @ApiCreatedResponse({ description: '{accessToken: string}' })
     @Post('login')

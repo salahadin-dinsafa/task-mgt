@@ -25,8 +25,10 @@ async function bootstrap() {
     .setTitle('Task Management Application')
     .setDescription('Task Management Application is based on role of user. A user can create, update, remove, get his own tasks')
     .setVersion('1.0.0')
+    .setContact('Salahadin Dinsafa', '', 'salahadindinsafa@gmail.com')
+    .setLicense('MIT', 'https://openapi.api/license/MIT')
     .build();
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, options, { ignoreGlobalPrefix: true });
   SwaggerModule.setup('api', app, document);
 
   const port: number = +process.env.PORT || 3001;
