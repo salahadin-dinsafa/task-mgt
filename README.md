@@ -23,3 +23,4 @@
 <h1>Instruction</h1>
 <p>start app: npm run start</p>
 <p>start app development: npm run start:dev</p>
+<p>Read api specification: /api</p>
