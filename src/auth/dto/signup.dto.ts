@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
 
 export class SignupDto {
     @ApiProperty({
-        description: 'The name of user',
+        description: 'Name of the user',
         example: 'foo'
     })
     @IsNotEmpty()

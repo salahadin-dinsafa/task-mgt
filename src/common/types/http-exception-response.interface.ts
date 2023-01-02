@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsNumber, IsString } from "class-validator";
+import { number } from "joi";
 
 export interface HttpExceptionResponse {
   statusCode: number;
@@ -13,40 +14,34 @@ export interface CoustomeHttpExceptionResponse extends HttpExceptionResponse {
   timeStamp: Date;
 }
 
-export class CoustomeExceptionDto {
+export class CoustomeHttpException {
   @ApiProperty({
-    description: 'Status code of error'
+    example: 'number'
   })
-  @IsNumber()
   statusCode: number;
-  
+
   @ApiProperty({
-    description: 'Error of exception'
+    example: 'string'
   })
-  @IsString()
   error: string;
-  
+
   @ApiProperty({
-    description: 'Error message'
+    example: 'string'
   })
-  @IsString()
   message: string;
-  
+
   @ApiProperty({
-    description: 'Url path'
+    example: 'string'
   })
-  @IsString()
   path: string;
-  
+
   @ApiProperty({
-    description: 'Url method'
+    example: 'string'
   })
-  @IsString()
   method: string;
-  
+
   @ApiProperty({
-    description: 'Time at which exception occurred'
+    example: 'Date'
   })
-  @IsDate()
   timeStamp: Date;
 }

@@ -1,10 +1,15 @@
 import {
     Body, Controller, Delete,
-    Get, Logger, Param, ParseIntPipe, Patch, Post, Query, UseGuards
+    Get, Logger, Param, ParseIntPipe,
+    Patch, Post, Query, UseGuards
 } from "@nestjs/common";
 
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse, ApiCreatedResponse, ApiInternalServerErrorResponse,
+    ApiNotFoundResponse, ApiOkResponse, ApiOperation,
+    ApiTags, ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 
 import { TaskEntity } from "./entities/task.entity";
 import { UserEntity } from "../auth/entities/user.entity";
@@ -17,13 +22,15 @@ import { TaskPipe } from "./pipe/task.pipe";
 import { TaskStatus } from "./types/task-status.enum";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Role } from "../auth/types/role.enum";
-import { CoustomeExceptionDto } from "../common/types/http-exception-response.interface";
+import { CoustomeHttpException } from "../common/types/http-exception-response.interface";
+import { TaskResponse, TaskResponseType } from "./types/task-response.type";
 
-@ApiResponse({ status: 403, type: CoustomeExceptionDto })
-@ApiBadRequestResponse({ description: 'Invalid request' })
-@ApiInternalServerErrorResponse({ description: 'Internal server error occured' })
+@ApiBadRequestResponse({ type: CoustomeHttpException, description: 'Bad request' })
+@ApiUnauthorizedResponse({ type: CoustomeHttpException, description: 'Unauthorized' })
+@ApiBadRequestResponse({ type: CoustomeHttpException, description: 'Invalid request' })
+@ApiInternalServerErrorResponse({ type: CoustomeHttpException, description: 'Internal server error occured' })
 @ApiTags('Tasks')
-@UseGuards(AuthGuard(), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('tasks')
 export class TasksController {
     private logger = new Logger('TasksController');
@@ -32,12 +39,13 @@ export class TasksController {
     ) { }
 
     @ApiOperation({ description: 'Get all tasks create by user: Auth required', summary: 'Get letest articles' })
+    @ApiOkResponse({ type: TaskResponse, isArray: true })
     @Roles(Role.ADMIN, Role.USER)
     @Get()
     findAllTasks(
         @Query() paginationDto: PaginationDto,
         @GetUser() user: UserEntity,
-    ): Promise<TaskEntity[]> {
+    ): Promise<TaskResponseType[]> {
         this.logger.verbose(
             `User ${user.username} retriving tasks with filter: ${JSON.stringify(paginationDto)}`
         );
@@ -46,41 +54,44 @@ export class TasksController {
 
 
     @ApiOperation({ description: 'Get a task create by user: Auth required', summary: 'Get a single task' })
-    @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
+    @ApiNotFoundResponse({ type: CoustomeHttpException, description: 'Task with not found' })
+    @ApiOkResponse({ type: TaskResponse, description: 'Task found' })
     @Roles(Role.ADMIN, Role.USER)
     @Get(':id')
     findTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: UserEntity,
-    ): Promise<TaskEntity> {
+    ): Promise<TaskResponse> {
         this.logger.verbose(
             `User ${user.username} retriving task with id: ${id}`
         );
-        return this.taskService.findTaskById(user, id)
+        return this.taskService.findTask(user, id)
     }
 
+    @ApiCreatedResponse({ type: TaskResponse, description: 'Task is created' })
     @ApiOperation({ description: 'Create task: Auth required', summary: 'Create task' })
     @Roles(Role.ADMIN, Role.USER)
     @Post()
     addTask(
         @Body() addTaskDto: AddTaskDto,
         @GetUser() user: UserEntity,
-    ): Promise<TaskEntity> {
+    ): Promise<TaskResponseType> {
         this.logger.verbose(
             `User ${user.username} creating task with object: ${JSON.stringify(addTaskDto)}`
         );
         return this.taskService.addTask(user, addTaskDto);
     }
 
+    @ApiOkResponse({ type: TaskResponse, description: 'Updated' })
     @ApiOperation({ description: 'Update task created by user: Auth required', summary: 'Update task' })
-    @ApiNotFoundResponse({ description: 'Task with #id: ${id} not found' })
+    @ApiNotFoundResponse({ type: CoustomeHttpException, description: 'Task with #id: not found' })
     @Roles(Role.ADMIN, Role.USER)
     @Patch(':id/status')
     updateTask(
         @Param('id', ParseIntPipe) id: number,
         @Body('status', TaskPipe) status: TaskStatus,
         @GetUser() user: UserEntity,
-    ): Promise<TaskEntity> {
+    ): Promise<TaskResponseType> {
         this.logger.verbose(
             `User ${user.username} updating task with id: ${id}`
         );

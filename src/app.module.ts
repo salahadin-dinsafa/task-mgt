@@ -8,7 +8,6 @@ import * as Joi from '@hapi/joi';
 import { TasksModule } from './tasks/tasks.module';
 import { ormConfig } from './common/db/ormconfig.db';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
 
 
 @Module({
@@ -24,13 +23,12 @@ import { AppController } from './app.controller';
         ROLES_KEY: Joi.required()
       })
     }),
-    TasksModule,
     TypeOrmModule.forRootAsync({
       useFactory: ormConfig
     }),
-    AuthModule
+    AuthModule,
+    TasksModule,
   ],
-  controllers: [AppController],
   providers: [
     {
       provide: APP_PIPE,

@@ -12,6 +12,7 @@ import { SignupType } from './types/signup.interface';
 import { UserEntity } from './entities/user.entity';
 import { LoginType } from './types/login.interface';
 import { JwtPayload } from './types/jwt-payload.interface';
+import { Token } from './types/toke.type';
 
 @Injectable()
 export class AuthService {
@@ -34,20 +35,21 @@ export class AuthService {
     }
     async signup(signup: SignupType): Promise<UserEntity> {
         const { username, password } = signup;
+        let user: UserEntity = await this.findByName(username);
+        if (user)
+            throw new ConflictException('user already exist');
         try {
-            const user = this.userRepository.create({
+            user = this.userRepository.create({
                 username,
                 password
             })
-            return await this.userRepository.save(user);
+            return this.getUserResponse(await user.save());
         } catch (error) {
-            this.logger.error(`${error.message}`)
-            if (error.code === '23505') throw new ConflictException('user already exist');
             throw new InternalServerErrorException(`Internal server error occured: ${error.message}`)
         }
     }
 
-    async login(login: LoginType): Promise<{ accessToken: string }> {
+    async login(login: LoginType): Promise<Token> {
         const { username, password } = login;
         let user: UserEntity = await this.findByName(username);
 
@@ -62,5 +64,12 @@ export class AuthService {
         const accessToken: string = await this.jwtService.signAsync(payload);
         this.logger.debug(`Generating Jwt token with payload: ${JSON.stringify(payload)}`)
         return { accessToken }
+    }
+
+    getUserResponse(user: UserEntity): UserEntity {
+        delete user.password;
+        if (user.tasks)
+            delete user.tasks;
+        return user;
     }
 }
